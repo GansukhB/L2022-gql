@@ -12,7 +12,12 @@ const app: Express = express();
 //   console.log("Server running");
 // });
 
-const messages = [
+interface Msg {
+  text: string;
+  author: string;
+}
+
+const messages: Msg[] = [
   {
     text: "message1",
     author: "gansukh",
@@ -29,7 +34,7 @@ const typeDefs = `#graphql
         author: String
     }
     type Query {
-        messages: [Message]
+        messages(author: String): [Message]
     }
     input MessageInput {
         text: String
@@ -43,8 +48,15 @@ const typeDefs = `#graphql
 
 const resolvers = {
   Query: {
-    messages: () => {
-      return messages;
+    messages: (_: any, args: any, context: any) => {
+      console.log(args.author);
+      let res: Msg[] = [];
+      for (let msg of messages) {
+        if (msg.author === args.author) {
+          res.push(msg);
+        }
+      }
+      return res;
     },
   },
   Mutation: {
